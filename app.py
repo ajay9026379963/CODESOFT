@@ -1,23 +1,37 @@
-import streamlit as st
-import pandas as pd 
+import streamlit as st 
+import pandas as pd
 import joblib
-import numpy as np
 
-# Load the pre trained model
-model= joblib.load('credit_card_froud.pkl')
-st.title("Credit Card Fraud Detection")
+# load the trained model 
+model = joblib.load('linear_model.pkl')
 
-# Get user input features 
-input_df = st.text_input("Enter all required features:")
-input_df_splited = input_df.split(",")
+# user input frame 
 
-submit = st.button('Submit')
+st.title('IIRS flower prediction app')
 
-if submit:
-    feature = np.array(input_df_splited, dtype= np.float64)
-    prediction = model.predict(feature.reshape(1, -1)) 
+sepal_lenth = st.slider('sepal length')
+sepal_weight = st.slider('sepal weight')
+petal_length = st.slider('petal length')
+petal_weight = st.slider('petal weight')
+
+# convert categorical input to numerical using label encoder
+encoder = joblib.load('label_encoder.pkl')
+
+
+
+# prepare input row for prediction 
+
+data = pd.DataFrame({
+   'sepal_length': [sepal_lenth],
+   'sepal_width': [sepal_weight],
+   'petal_length': [petal_length],
+   'petal_width': [petal_weight] 
+})
+
+# make prediction
+
+if st.button('Predict'):
+    prediction = model.predict(data)[0]
+    st.write(f'The prediction flower is {prediction}')
+    st.success('Prediction successfully completed')
     
-    if prediction[0] == 0:
-        st.write("The transaction is Not Fraudulent")
-    else:
-        st.write("The transaction is Fraudulent")
